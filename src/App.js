@@ -1,11 +1,14 @@
-import './App.css';
+import React from 'react';
+import './components/scss/generic-list-page.scss';
+import init from './components/js/todo-list';
 
-function App() {
+function App() {  
   return (
-    <div className="App">
-      <h1>First Commit</h1>
-    </div>
+    <>
+    </>
   );
 }
+
+
 
 export default App;

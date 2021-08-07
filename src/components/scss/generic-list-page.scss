@@ -69,14 +69,18 @@ html{
               font-size: 60px;
             }
           }
-          img{
+          .todoicon{
+            background-image: url("../img/ToDoIcon.svg");
+            background-size: cover;
             width: 200px;
+            height: 138.58px;
             position: relative;
             left: 10px;
             top: -18px;
             opacity: 100%;
             @media screen and (max-width: 850px){
               width: 120px;
+              height: 83.15px;
               top: 0;
             }
           }

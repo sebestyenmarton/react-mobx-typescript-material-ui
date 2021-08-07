@@ -1,5 +1,5 @@
-import { SORT_DIRECTION } from './generic-todo-store.mjs';
-import { BaseComponent } from '../core/base-component.mjs';
+import { SORT_DIRECTION } from './generic-todo-store.js';
+import { BaseComponent } from '../core/base-component.js';
 
 
 export class GenericlistComponent extends BaseComponent {
@@ -38,7 +38,6 @@ export class GenericlistComponent extends BaseComponent {
         const deleteAction = { tagName: 'i', attributes: { className: 'fas fa-trash-alt', onclick: () => this.store.delete(item) }};
         const actionLiBox = this.renderUlLi({}, [deleteAction]);
 
-        console.log(item);
         return { tagName: 'li', attributes: { onclick: () => this.store.setCurrentItem(item) }, children: [...libox, actionLiBox] };
     }
     renderUlLi = (attributes, children) => {
@@ -114,7 +113,7 @@ export class GenericlistComponent extends BaseComponent {
             children: [ 
                 { tagName: 'div', attributes: { className: 'titlebox' }, children: [
                     { tagName: 'h2', attributes: { className: 'titletext' }, children: [titleText]},
-                    { tagName: 'img', attributes: { src: "../../img/ToDoIcon.svg", alt: 'To do image' }},
+                    { tagName: 'div', attributes: { className: 'todoicon' }},
                 ]},
                 form,
             ]}; 

@@ -68,6 +68,7 @@ export class GenericlistStore {
     }
 
     update = async  (data) => {
+        const Model = this.listConfig.model;
         const request = await fetch(this.listConfig.endpoint + data.id, { 
             method: 'PUT',
             body: JSON.stringify(data),

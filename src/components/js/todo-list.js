@@ -1,6 +1,8 @@
-import { GenericlistComponent } from './generic-list-page/generic-todo-component.mjs';
-import { GenericlistStore } from './generic-list-page/generic-todo-store.mjs';
-import { Employee } from './Todo.mjs';
+import React from 'react';
+import { GenericlistComponent } from './generic-list-page/generic-todo-component.js';
+import { GenericlistStore } from './generic-list-page/generic-todo-store.js';
+import { Employee } from './Todo.js';
+
 
 if (document.readyState === 'complete') { this.init(); } 
     else {window.addEventListener('load', init);}
@@ -64,3 +66,6 @@ function init() {
     const cmp = new GenericlistComponent(listStore);
     cmp.mount(parentElement);
 }
+
+export default init;
+
