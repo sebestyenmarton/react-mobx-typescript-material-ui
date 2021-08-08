@@ -1,10 +1,11 @@
 import React from 'react';
+import ReactDOM from "react-dom";
 import { GenericlistComponent } from './generic-list-page/generic-todo-component.js';
 import { GenericlistStore } from './generic-list-page/generic-todo-store.js';
 import { Employee } from './Todo.js';
 
 
-if (document.readyState === 'complete') { this.init(); } 
+if (React.readyState === 'complete') { this.init(); } 
     else {window.addEventListener('load', init);}
 
 

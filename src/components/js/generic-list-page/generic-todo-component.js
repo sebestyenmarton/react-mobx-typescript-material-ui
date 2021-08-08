@@ -1,8 +1,10 @@
+import React, {Component} from 'react';
+import ReactDOM from "react-dom";
 import { SORT_DIRECTION } from './generic-todo-store.js';
-import { BaseComponent } from '../core/base-component.js';
+//import { BaseComponent } from '../core/base-component.js';
 
 
-export class GenericlistComponent extends BaseComponent {
+export class GenericlistComponent extends React.Component {
     listConfig = null;
     store = null;
 
@@ -15,148 +17,133 @@ export class GenericlistComponent extends BaseComponent {
 
     renderUl = () => {
         const bodyRows = this.store.getItems().map(item => this.renderBodyRow(item));
-        const ulist = { tagName: 'ul', attributes: this.listConfig.attributes, children: [ ...bodyRows] };
-        return { tagName: 'div', attributes: { className: 'list-container' }, children: [ulist] };
+        const ulist = (<ul {this.listConfig.attributes}>{...bodyRows}</ul>);
+        return ( <div className='list-container'>{ulist}</div> );
     }
 
-    renderHeadRow = () => { 
+    renderHeadRow = () => {
         const libox = this.listConfig.columns.map(column => {
             const ul = this.renderListHeadRow(column);
             return ul;
         });
-        const actionLiBox = { tagName: 'div', children: ['Actions'], attributes: { className: 'enabling' }};
-        const checkLiBox = { tagName: 'div', children: ['Is Done'], attributes: { className: 'enabling' }};
-        return { tagName: 'li', children: [checkLiBox,...libox, actionLiBox] };
-    }   
+        const actionLiBox = (<div className='enabling'>Actions</div>);
+        const checkLiBox = (<div className='enabling'>Is Done</div>);
+        return (<li>{checkLiBox, ...libox, actionLiBox}</li>);
+    }
 
     renderBodyRow = (item) => {
         const libox = this.listConfig.columns.map(column => {
             const ul = this.renderUlLi(column.attributes, [column.getCellValue(item)]);
             return ul;
         });
-        
-        const deleteAction = { tagName: 'i', attributes: { className: 'fas fa-trash-alt', onclick: () => this.store.delete(item) }};
+        const deleteAction = ( <i className='fas fa-trash-alt' onClick={() => this.store.delete(item)}></i>);
         const actionLiBox = this.renderUlLi({}, [deleteAction]);
-
-        return { tagName: 'li', attributes: { onclick: () => this.store.setCurrentItem(item) }, children: [...libox, actionLiBox] };
+        return ( 
+            <li onclick={() => this.store.setCurrentItem(item)}>
+                {...libox, actionLiBox}
+            </li>
+        );
     }
+
     renderUlLi = (attributes, children) => {
-        return { tagName: 'div', attributes, children };
+        return (
+            <div {attributes}>
+                {children}
+            </div>
+        );
     }
 
     renderListHeadRow = (column) => {
         const [ASC] = SORT_DIRECTION;
-        const attributes = Object.assign({ className: 'sorlist' }, column.attributes);
-        const children = [
-            { tagName: 'span', attributes: column.attributes, children: [column.label],  attributes: { className: 'sorttext' } }
-        ];
-
+        const children = (<span className='sorttext' {column.attributes}>column.label</span>);
         const [sortId, direction] = this.store.currentSort;
         if (column.sorter) {
-            attributes.onclick = () => this.store.setSort(column.id);
             if (sortId === column.id) {
-                const arrow = { tagName: 'span', attributes: { className: 'sort-arrow' }, children: [direction === ASC ? '↑': '↓'] };
+                if(direction === ASC){
+                    const arrow = (<span className='sort-arrow'>↑</span>);
+                }
+                else{
+                    const arrow = (<span className='sort-arrow'>↓</span>);
+                }
                 children.push(arrow);
             }
         }
-
-        return { tagName: 'div', attributes, children };
-    }
-
-    renderForm = () => {
-
-        const item = this.store.currentItem;
-        const { formFields } = this.listConfig;
-        const descriptionText = "Let's Start Planning!";
-        const titleText = "To do list";
-
-        const children = [
-            { tagName: 'h3', children: [descriptionText], attributes: { className: 'title' }},
-        ];
-
-        formFields.forEach(fieldAttributes => {
-            let value = item[fieldAttributes.name] || '';
-            if (fieldAttributes.type === 'checkbox') {
-                fieldAttributes.checked = item[fieldAttributes.name]
-            } else if (fieldAttributes.type === 'datetime-local' && typeof value === 'string') {
-                value = value.substr(0, 16);
-            }
-            children.push({ tagName: 'input', attributes: {...fieldAttributes, value: value } });
-        });
-
-        children.push(
-            this.renderAddButton(),
-            { 
-                tagName: 'button', 
-                attributes: { type: 'button', 
-                className: 'buttons',
-                onclick: () => this.store.setCurrentItem() }, 
-                children: ['Cancel'] 
-            },
-            { 
-                tagName: 'input',  
-                attributes: { className: 'buttons', value: 'Save', type: 'submit' } 
-            },
-            this.renderSearchBar(),
-            this.renderHeadRow()
+        return (
+            <div className='sorlist' {column.attributes} onClick ={() => this.store.setSort(column.id)}>
+                {children} 
+            </div>
         );
-        const form = { 
-            tagName: 'form', 
-            attributes: { onsubmit: this.store.onSubmit }, 
-            children
-        };
-
-
-        return { 
-            tagName: 'div', 
-            attributes: { className: 'add-edit-form' }, 
-            children: [ 
-                { tagName: 'div', attributes: { className: 'titlebox' }, children: [
-                    { tagName: 'h2', attributes: { className: 'titletext' }, children: [titleText]},
-                    { tagName: 'div', attributes: { className: 'todoicon' }},
-                ]},
-                form,
-            ]}; 
     }
+ 
 
-    renderSearchBar = () => {
-        const searchText = "Search for an existing plan:";
-        return { 
-            tagName: 'div', 
-            attribtues: { className: 'search-container' }, 
-            children: [
-                {
-                    tagName: 'h3', 
-                    attributes: { className: 'searchText' }, children: [searchText]
-                },
-                { 
-                    tagName: 'input', 
-                    attributes: { placeholder: 'search', className: 'searchbar', value: this.store.searchTerm, onkeyup: this.store.onSearch } 
+
+    class renderForm extends Component{
+        render(){
+            const formFields = Object.keys(this.listConfig);
+            const children = (<h3 className='title'>Let's Start Planning!</h3>);
+
+            formFields.forEach(fieldAttributes => {
+                let value = this.store.currentItem[fieldAttributes.name] || '';
+                if (fieldAttributes.type === 'checkbox') {
+                    fieldAttributes.checked = this.store.currentItem[fieldAttributes.name]
+                } else if (fieldAttributes.type === 'datetime-local' && typeof value === 'string') {
+                    value = value.substr(0, 16);
                 }
-            ]
-        };
-    }
-    renderAddButton = () => {
-        return { 
-            tagName: 'div', 
-            attributes: { className: 'add-container' }, 
-            children: [
-                { 
-                    tagName: 'button', 
-                    attributes: { className: 'buttons', onclick: () => this.store.setCurrentItem() }, 
-                    children: ['+'] 
-                }
-            ] 
-        };
-    }
+                children.push( <imput {...fieldAttributes, value: value} /> );
+            });
+
+            children.push(
+                <NewButton/>,
+                <button className='buttons' type='button' onClick={()=>this.store.setCurrentItem()}>Cancel</button>,
+                <input className='buttons' type='submit' value='Save'></input>,
+                <renderSearchBar/>,
+                <renderHeadRow/>
+            )
+            return(
+                <div className='add-edit-form'>
+                    <div className='titlebox'>
+                        <h2 className='tittext'>
+                            To do list
+                        </h2>
+                        <div className='todoicon'></div>
+                    </div>
+                    <form onsubmit={()=>this.store.onSubmit}>
+                        <children>
+                    </form>
+                </div>
+            );
+        }
+    };
+
+    class renderSearchBar extends Component{
+        render(){
+            return(
+                <div className='search-container'>
+                    <h3 className='searchText'>Search for an existing plan:</h3>
+                    <input className='searchbar' placeholder='search' value={this.store.searchTerm} onkeyup={this.store.onSearch}></input>
+                </div>
+            );
+        }
+    };
+
+    class NewButton extends Component{
+        render(){
+            return(
+                <div className='add-container'>
+                    <button className='buttons' onClick = { () => this.store.setCurrentItem() }>New</button>
+                </div>
+            );
+        }
+    };
 
     render() {
-        const children = [
-            this.renderUl()
-        ];
+        const children = [this.renderUl()];
         if (this.store.currentItem) {
             children.unshift(this.renderForm());
-        } 
-        return this.renderElement({ tagName: 'div', attributes: { className: 'generic-list-page' }, children });
+        }
+        return ReactDOM.createPortal(
+            this.renderElement(<div className='generic-list-page'>{children}</div>),
+            domNode
+        );
     }
 }
