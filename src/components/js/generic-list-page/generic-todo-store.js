@@ -1,7 +1,7 @@
 function guid() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       const r = Math.random() * 16 | 0; 
-      let v = c == 'x' ? r : (r & 0x3 | 0x8);
+      let v = c === 'x' ? r : ((r & 0x3) | 0x8);
       return v.toString(16);
     });
 }
@@ -9,9 +9,9 @@ function guid() {
 export const SORT_DIRECTION = ['ASC', 'DESC'];
 
 export class GenericlistStore {
-    refreshCb = null;           // function
+    forceUpdate = null;           // function
     listConfig = null;         // list config
-    currentItem = 1;         // current item for add and edit
+    currentItem = null;         // current item for add and edit
     sorlistColumns = [];       // which columns should be sorted
     currentSort = [];           // [id, direction]
     searchTerm = '';            // search term
@@ -19,6 +19,7 @@ export class GenericlistStore {
     
     constructor(listConfig) {
         this.listConfig = listConfig;
+        this.currentItem = new listConfig.model();
         this.init();
     }
 
@@ -63,7 +64,7 @@ export class GenericlistStore {
         });
         const savedItem = await request.json();
         const mappedItem = new Model(savedItem);
-        this.setItems([mappedItem, ...this.items, item]);
+        this.setItems([mappedItem, ...this.items]);
         return mappedItem;
     }
 
@@ -95,8 +96,8 @@ export class GenericlistStore {
 
     setItems(items) {
         this.items = items;
-        if (this.refreshCb) {
-            this.refreshCb();
+        if (this.forceUpdate) {
+            this.forceUpdate();
         }
     }
 
@@ -106,9 +107,24 @@ export class GenericlistStore {
             currentItem = new Model();
         }
         this.currentItem = currentItem;
-        if (this.refreshCb) {
-            this.refreshCb();
+        if (this.forceUpdate) {
+            this.forceUpdate();
         }
+    }
+
+    onChangeCurrentItem = (event) => {
+        const elem = event.currentTarget;
+        if (!elem.name) { 
+            return console.error('Element doesn\'t have name attribute');
+        }
+        let value = elem.value;
+        if (elem.type === 'checkbox') {
+            value = elem.checked;
+        } else if (elem.type === 'datetime-local') {
+            value = new Date(value).toISOString();
+        }
+        this.currentItem[elem.name] = value;
+        this.setCurrentItem(this.currentItem);
     }
     
     setSort = (id) => {
@@ -123,8 +139,8 @@ export class GenericlistStore {
     onSearch = (event) => {
         if (event.key !== "Enter") { return; }
         this.searchTerm = event.target.value.trim();
-        if (this.refreshCb) {
-            this.refreshCb();
+        if (this.forceUpdate) {
+            this.forceUpdate();
         }
     }
 

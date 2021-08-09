@@ -37,12 +37,7 @@ function init() {
             {
                 id: 'isDone',
                 label: 'Is Done',
-                getCellValue: (task) => 
-                    task.isDone 
-                        ? 
-                    { tagName: 'input', attributes: { type: 'checkbox', className: 'myCheck', checked: true}} 
-                        : 
-                    { tagName: 'input', attributes: { type: 'checkbox', className: 'myCheck', checked: false } },
+                getCellValue: (task) => task.isDone ? 'done' : 'not done',
                 attributes: {},
             },
             {
@@ -64,8 +59,7 @@ function init() {
 
     const parentElement = document.querySelector('#root');
     const listStore = new GenericlistStore(listConfig);
-    const cmp = new GenericlistComponent(listStore);
-    cmp.mount(parentElement);
+    ReactDOM.render(<GenericlistComponent store={listStore} />, parentElement );
 }
 
 export default init;
