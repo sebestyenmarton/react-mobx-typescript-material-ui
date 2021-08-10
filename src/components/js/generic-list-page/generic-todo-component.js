@@ -8,7 +8,6 @@ export class GenericlistComponent extends Component {
     componentDidMount() {
         this.store = this.props.store;
         this.listConfig = this.store.listConfig;
-        console.log(this.store);
         const s = this;
         this.store.forceUpdate = function() {
             s.forceUpdate();
